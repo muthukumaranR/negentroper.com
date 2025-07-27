@@ -1,0 +1,72 @@
+[
+  {
+    "name": "Main Website",
+    "subdomain": "www",
+    "port": 3001,
+    "type": "web",
+    "description": "Main company website built with Next.js",
+    "healthCheckPath": "/",
+    "ssl": true,
+    "autoStart": true,
+    "tags": ["website", "nextjs", "production"],
+    "status": "active",
+    "registeredAt": "2025-01-20T10:00:00.000Z",
+    "lastUpdate": "2025-01-20T10:00:00.000Z"
+  },
+  {
+    "name": "API Server",
+    "subdomain": "api",
+    "port": 3002,
+    "type": "api",
+    "description": "REST API server built with Express.js",
+    "healthCheckPath": "/health",
+    "ssl": true,
+    "autoStart": true,
+    "tags": ["api", "express", "production"],
+    "status": "active",
+    "registeredAt": "2025-01-20T10:05:00.000Z",
+    "lastUpdate": "2025-01-20T10:05:00.000Z"
+  },
+  {
+    "name": "Development Blog",
+    "subdomain": "blog",
+    "port": 3003,
+    "type": "web",
+    "description": "Company blog built with Gatsby",
+    "healthCheckPath": "/",
+    "ssl": true,
+    "autoStart": false,
+    "tags": ["blog", "gatsby", "content"],
+    "status": "active",
+    "registeredAt": "2025-01-20T10:10:00.000Z",
+    "lastUpdate": "2025-01-20T10:10:00.000Z"
+  },
+  {
+    "name": "Admin Dashboard",
+    "subdomain": "admin",
+    "port": 3004,
+    "type": "web",
+    "description": "Internal admin dashboard built with React",
+    "healthCheckPath": "/api/health",
+    "ssl": true,
+    "autoStart": true,
+    "tags": ["admin", "react", "internal"],
+    "status": "active",
+    "registeredAt": "2025-01-20T10:15:00.000Z",
+    "lastUpdate": "2025-01-20T10:15:00.000Z"
+  },
+  {
+    "name": "Documentation Site",
+    "subdomain": "docs",
+    "port": 3005,
+    "type": "web",
+    "description": "Product documentation site built with Docusaurus",
+    "healthCheckPath": "/",
+    "ssl": true,
+    "autoStart": true,
+    "tags": ["docs", "docusaurus", "public"],
+    "status": "active",
+    "registeredAt": "2025-01-20T10:20:00.000Z",
+    "lastUpdate": "2025-01-20T10:20:00.000Z"
+  }
+]
