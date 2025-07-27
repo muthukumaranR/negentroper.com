@@ -238,7 +238,7 @@ export default function FunkyHomePage() {
             <div className="mb-8">
               <GlitchText className="text-6xl md:text-8xl font-bold tracking-tight mb-4">
                 <span className="bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-pulse">
-                  NEGENTROPER
+                  NEGENTROPER v1.0
                 </span>
               </GlitchText>
               
