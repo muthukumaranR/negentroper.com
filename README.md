@@ -1,26 +1,78 @@
-# Negentroper CMS
+# 🧠 Negentropic.com - AI/Computer Scientist Personal Landing Page
 
-An AI-driven content management system built with Next.js 14, TypeScript, and modern web technologies. This CMS is designed for the negentroper.com website and includes advanced features for content creation, project showcasing, and AI-powered assistance.
+A modern, cyberpunk-themed personal landing page featuring neural network animations, interactive particles, and cutting-edge web technologies.
 
-## 🚀 Features
+## 🎨 Features
 
-- **Modern Tech Stack**: Next.js 14 with App Router, TypeScript, Tailwind CSS
-- **Database**: PostgreSQL with Drizzle ORM
-- **Authentication**: NextAuth.js with OAuth providers (Google, GitHub)
-- **AI Integration**: Support for OpenAI and Anthropic APIs
-- **Content Management**: Full CRUD operations for writings, pages, and projects
-- **Media Management**: Cloudinary integration for image/video handling
-- **Theme Support**: Dark/light mode with next-themes
-- **State Management**: React Query for server state, Zustand for client state
+### Visual Effects
+- **Neural Network Background**: Animated nodes and connections with gradient effects
+- **Matrix Digital Rain**: Falling binary code with authentic terminal aesthetics
+- **Glitch Text Effects**: RGB color separation on headers and titles
+- **Interactive Particles**: Mouse-reactive particle system with burst effects
+- **Floating Geometries**: Animated geometric shapes with parallax movement
 
-## 🏗️ Architecture
+### Technology Stack
+- **Frontend**: Next.js 15 + React 18 + TypeScript
+- **Styling**: Tailwind CSS + Custom animations + shadcn/ui
+- **Database**: PostgreSQL + Drizzle ORM
+- **Deployment**: Docker + Nginx + GitHub Actions
+- **Performance**: 95+ Lighthouse score target
 
-This project follows the existing negentroper architecture with:
+### AI Integration
+- **Content Generation**: Anthropic Claude + OpenAI integration
+- **Research Summaries**: AI-powered paper analysis
+- **Code Explanation**: Automated technical documentation
 
-- **Microservices-ready**: API routes structured for easy extraction
-- **Event-driven**: Prepared for async messaging patterns
-- **AI-first**: Integrated AI capabilities throughout
-- **Security by design**: Zero-trust security model
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18+
+- Docker & Docker Compose
+- PostgreSQL (for production)
+
+### Development
+```bash
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+```
+
+### Production Deployment
+```bash
+# Build and run with Docker
+docker-compose up -d
+
+# Check health
+curl http://localhost:3000/api/health
+```
+
+## 🔧 CI/CD Pipeline
+
+The repository includes a complete GitHub Actions workflow:
+
+- **CI**: TypeScript checking, ESLint, Prettier, security scanning
+- **CD**: Docker build, zero-downtime deployment, health checks
+- **Monitoring**: Automated rollback, Slack notifications
+- **Security**: Vulnerability scanning, security headers
+
+## 📊 Performance
+
+- **Core Web Vitals**: LCP <2.5s, FID <100ms, CLS <0.1
+- **Bundle Size**: <100KB initial JavaScript payload
+- **Image Optimization**: WebP/AVIF with responsive loading
+- **Caching**: Redis + static generation with ISR
+
+## 🛡️ Security
+
+- **Headers**: CSP, HSTS, XSS protection
+- **Rate Limiting**: API protection with LRU cache
+- **SSL/TLS**: Proper cipher configuration
+- **Container Security**: Non-root execution, vulnerability scanning
 
 ## 📁 Project Structure
 
@@ -29,132 +81,82 @@ negentroper-cms/
 ├── app/                    # Next.js App Router
 │   ├── api/               # API routes
 │   ├── admin/             # Admin dashboard
-│   ├── auth/              # Authentication pages
-│   ├── writings/          # Writings section
-│   ├── projects/          # Projects showcase
-│   └── globals.css        # Global styles
-├── components/            # Reusable UI components
-│   ├── ui/               # shadcn/ui components
-│   ├── forms/            # Form components
-│   ├── layouts/          # Layout components
-│   └── content/          # Content-specific components
-├── lib/                   # Utility libraries
-│   ├── database/         # Database schema and connection
-│   ├── auth/             # Authentication configuration
-│   ├── ai/               # AI service integrations
-│   └── utils.ts          # Utility functions
-├── providers/             # React context providers
-├── services/              # External service integrations
-├── types/                 # TypeScript type definitions
-└── data/                  # Database migrations and seeds
+│   └── page.tsx           # Landing page
+├── components/            # React components
+│   └── ui/               # shadcn/ui components
+├── lib/                  # Utilities and configurations
+├── public/               # Static assets
+├── .github/workflows/    # CI/CD pipelines
+├── Dockerfile           # Container configuration
+└── docker-compose.yml  # Orchestration
 ```
 
-## 🛠️ Installation
+## 🌟 Key Components
 
-1. **Clone and navigate to project**:
-   ```bash
-   cd negentroper-cms
-   ```
+### Landing Page (`app/page.tsx`)
+- Hero section with glitch effects
+- Feature grid with terminal windows
+- Interactive background effects
+- Call-to-action sections
 
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+### Background Effects
+- **Neural Network**: SVG-based animated visualization
+- **Matrix Rain**: CSS-animated falling code
+- **Particle System**: Canvas-based interactive particles
+- **Geometric Shapes**: Floating animated elements
 
-3. **Set up environment variables**:
-   ```bash
-   cp .env.example .env.local
-   # Edit .env.local with your actual values
-   ```
+### UI Components
+- **Theme Toggle**: Dark/light mode with system detection
+- **Navigation**: Responsive mobile-friendly navbar
+- **Particles**: Mouse-reactive particle system
+- **Health Dashboard**: System monitoring interface
 
-4. **Set up the database**:
-   ```bash
-   # Generate migrations
-   npx drizzle-kit generate:pg
-   
-   # Run migrations
-   npx drizzle-kit push:pg
-   ```
+## 📈 Monitoring & Health
 
-5. **Start development server**:
-   ```bash
-   npm run dev
-   ```
+### Health Endpoints
+- `GET /api/health` - System health with database status
+- `GET /admin/health` - Admin dashboard with metrics
 
-## 📋 Environment Variables
-
-Required environment variables (see `.env.example`):
-
-- `DATABASE_URL`: PostgreSQL connection string
-- `NEXTAUTH_SECRET`: NextAuth.js secret key
-- `NEXTAUTH_URL`: Your app URL
-- `GOOGLE_CLIENT_ID` & `GOOGLE_CLIENT_SECRET`: OAuth credentials
-- `GITHUB_CLIENT_ID` & `GITHUB_CLIENT_SECRET`: OAuth credentials
-- `OPENAI_API_KEY`: OpenAI API key (optional)
-- `ANTHROPIC_API_KEY`: Anthropic API key (optional)
-- `CLOUDINARY_*`: Cloudinary credentials for media management
-
-## 🗃️ Database Schema
-
-The database follows the existing negentroper architecture with tables for:
-
-- **Users & Authentication**: OAuth accounts, sessions, preferences
-- **Content Management**: Content, revisions, metadata
-- **Media Library**: Files, metadata, processing status
-- **Projects**: Portfolio items with metadata
-- **Taxonomy**: Categories and tags
-- **AI Integration**: Prompts, responses, usage tracking
-
-## 🤖 AI Integration
-
-The CMS includes built-in AI capabilities:
-
-- Content generation assistance
-- Automatic summarization
-- SEO optimization suggestions
-- Image alt-text generation
-
-## 🔧 Development
-
-### Available Scripts
-
-- `npm run dev`: Start development server
-- `npm run build`: Build for production
-- `npm run start`: Start production server
-- `npm run lint`: Run ESLint
-- `npm run format`: Format code with Prettier
-- `npm run typecheck`: Run TypeScript checks
-
-### Database Operations
-
-- `npx drizzle-kit generate:pg`: Generate migrations
-- `npx drizzle-kit push:pg`: Push schema to database
-- `npx drizzle-kit studio`: Open Drizzle Studio
+### Metrics Tracked
+- Application performance
+- Database connection status
+- Memory and CPU usage
+- Error rates and response times
 
 ## 🚀 Deployment
 
-This project is deployment-ready for:
+### Environment Variables
+```bash
+# Copy and configure
+cp .env.example .env.local
 
-- **Vercel**: Optimized for Vercel deployment
-- **Docker**: Containerization support
-- **Kubernetes**: Cloud-native deployment
+# Required variables
+NEXTAUTH_SECRET=your-secret-key
+DATABASE_URL=postgresql://user:pass@host:5432/db
+ANTHROPIC_API_KEY=your-anthropic-key
+OPENAI_API_KEY=your-openai-key
+```
+
+### GitHub Secrets
+Set these in your repository settings:
+- `DEPLOY_HOST` - Your server IP/domain
+- `DEPLOY_USER` - SSH deployment user
+- `DEPLOY_SSH_KEY` - Private SSH key
+- `NEXTAUTH_SECRET` - Authentication secret
+- `DATABASE_URL` - Production database URL
 
 ## 🤝 Contributing
 
-1. Follow the existing code style and patterns
-2. Write tests for new features
-3. Update documentation as needed
-4. Use the provided linting and formatting tools
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and linting
+5. Submit a pull request
 
 ## 📄 License
 
-This project is part of the negentroper ecosystem and follows the same licensing terms.
+MIT License - see LICENSE file for details
 
-## 🙏 Acknowledgments
+---
 
-Built with the existing negentroper architecture and design patterns, leveraging:
-
-- Claude Flow coordination system
-- Existing database schema design
-- Proven security patterns
-- Performance optimization strategies
+**Built with 🧠 by Claude Code** - Transforming chaos into digital order through negentropic principles.
