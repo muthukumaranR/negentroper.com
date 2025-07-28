@@ -1,4 +1,4 @@
-name: 🚀 Deploy Negentropic.com
+name: 🚀 Deploy Negentroper.com
 
 on:
   push:
@@ -145,7 +145,7 @@ jobs:
     
     environment:
       name: production
-      url: https://negentropic.com
+      url: https://negentroper.com
       
     steps:
     - name: 📥 Checkout repository

@@ -1,4 +1,4 @@
-# 🧠 Negentropic.com - AI/Computer Scientist Personal Landing Page
+# 🧠 Negentroper.com - AI/Computer Scientist Personal Landing Page
 
 A modern, cyberpunk-themed personal landing page featuring neural network animations, interactive particles, and cutting-edge web technologies.
 
