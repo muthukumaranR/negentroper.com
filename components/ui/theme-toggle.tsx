@@ -15,7 +15,7 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <Button variant="ghost" size="sm" className="w-9 h-9 p-0">
+      <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
         <div className="h-4 w-4" />
       </Button>
     )
@@ -47,7 +47,7 @@ export function ThemeToggle() {
       variant="ghost"
       size="sm"
       onClick={toggleTheme}
-      className="w-9 h-9 p-0 hover:bg-purple-500/20 transition-all duration-300 hover:scale-110 border border-purple-500/30"
+      className="h-9 w-9 border border-purple-500/30 p-0 transition-all duration-300 hover:scale-110 hover:bg-purple-500/20"
       title={`Current theme: ${theme}. Click to cycle through themes.`}
     >
       <div className="transition-transform duration-300 hover:rotate-180">

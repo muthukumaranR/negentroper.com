@@ -34,7 +34,7 @@ export default function AdminHealthPage() {
       setLoading(true)
       const response = await fetch('/api/health')
       const data = await response.json()
-      
+
       if (response.ok) {
         setHealthData(data)
         setError(null)
@@ -42,7 +42,9 @@ export default function AdminHealthPage() {
         setError(data.error || 'Health check failed')
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch health data')
+      setError(
+        err instanceof Error ? err.message : 'Failed to fetch health data'
+      )
     } finally {
       setLoading(false)
     }
@@ -67,20 +69,20 @@ export default function AdminHealthPage() {
   if (loading && !healthData) {
     return (
       <div className="p-6">
-        <h1 className="text-2xl font-bold mb-6">System Health</h1>
-        <div className="text-center py-8">Loading health data...</div>
+        <h1 className="mb-6 text-2xl font-bold">System Health</h1>
+        <div className="py-8 text-center">Loading health data...</div>
       </div>
     )
   }
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">System Health</h1>
-        <button 
+        <button
           onClick={fetchHealthData}
           disabled={loading}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+          className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
         >
           {loading ? 'Refreshing...' : 'Refresh'}
         </button>
@@ -105,12 +107,16 @@ export default function AdminHealthPage() {
               <CardTitle>Overall Status</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className={`text-lg font-semibold ${
-                healthData.status === 'healthy' ? 'text-green-600' : 'text-red-600'
-              }`}>
+              <div
+                className={`text-lg font-semibold ${
+                  healthData.status === 'healthy'
+                    ? 'text-green-600'
+                    : 'text-red-600'
+                }`}
+              >
                 {healthData.status.toUpperCase()}
               </div>
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="mt-2 text-sm text-gray-600">
                 Last checked: {new Date(healthData.timestamp).toLocaleString()}
               </p>
             </CardContent>
@@ -124,13 +130,16 @@ export default function AdminHealthPage() {
             <CardContent>
               <div className="space-y-2">
                 <div>
-                  <span className="font-medium">Version:</span> {healthData.version}
+                  <span className="font-medium">Version:</span>{' '}
+                  {healthData.version}
                 </div>
                 <div>
-                  <span className="font-medium">Environment:</span> {healthData.environment}
+                  <span className="font-medium">Environment:</span>{' '}
+                  {healthData.environment}
                 </div>
                 <div>
-                  <span className="font-medium">Uptime:</span> {formatUptime(healthData.uptime)}
+                  <span className="font-medium">Uptime:</span>{' '}
+                  {formatUptime(healthData.uptime)}
                 </div>
               </div>
             </CardContent>
@@ -144,16 +153,20 @@ export default function AdminHealthPage() {
             <CardContent>
               <div className="space-y-2">
                 <div>
-                  <span className="font-medium">Heap Used:</span> {formatBytes(healthData.memory.used)}
+                  <span className="font-medium">Heap Used:</span>{' '}
+                  {formatBytes(healthData.memory.used)}
                 </div>
                 <div>
-                  <span className="font-medium">Heap Total:</span> {formatBytes(healthData.memory.total)}
+                  <span className="font-medium">Heap Total:</span>{' '}
+                  {formatBytes(healthData.memory.total)}
                 </div>
                 <div>
-                  <span className="font-medium">RSS:</span> {formatBytes(healthData.memory.rss)}
+                  <span className="font-medium">RSS:</span>{' '}
+                  {formatBytes(healthData.memory.rss)}
                 </div>
                 <div>
-                  <span className="font-medium">External:</span> {formatBytes(healthData.memory.external)}
+                  <span className="font-medium">External:</span>{' '}
+                  {formatBytes(healthData.memory.external)}
                 </div>
               </div>
             </CardContent>
@@ -165,13 +178,19 @@ export default function AdminHealthPage() {
               <CardTitle>Database Status</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className={`text-lg font-semibold ${
-                healthData.database.status === 'connected' ? 'text-green-600' : 'text-red-600'
-              }`}>
+              <div
+                className={`text-lg font-semibold ${
+                  healthData.database.status === 'connected'
+                    ? 'text-green-600'
+                    : 'text-red-600'
+                }`}
+              >
                 {healthData.database.status.toUpperCase()}
               </div>
               {healthData.database.error && (
-                <p className="text-sm text-red-600 mt-2">{healthData.database.error}</p>
+                <p className="mt-2 text-sm text-red-600">
+                  {healthData.database.error}
+                </p>
               )}
             </CardContent>
           </Card>
@@ -182,12 +201,18 @@ export default function AdminHealthPage() {
               <CardTitle>Environment Variables</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className={`text-lg font-semibold ${
-                healthData.environment_check.all_required_vars_present ? 'text-green-600' : 'text-red-600'
-              }`}>
-                {healthData.environment_check.all_required_vars_present ? 'ALL PRESENT' : 'MISSING VARS'}
+              <div
+                className={`text-lg font-semibold ${
+                  healthData.environment_check.all_required_vars_present
+                    ? 'text-green-600'
+                    : 'text-red-600'
+                }`}
+              >
+                {healthData.environment_check.all_required_vars_present
+                  ? 'ALL PRESENT'
+                  : 'MISSING VARS'}
               </div>
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="mt-2 text-sm text-gray-600">
                 Required environment variables status
               </p>
             </CardContent>

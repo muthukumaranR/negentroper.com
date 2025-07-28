@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Build outputs
+.next/
+out/
+dist/
+build/
+
+# Generated files
+.env*
+*.log
+
+# Binary files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.ico
+*.pdf
+
+# Documentation that shouldn't be formatted
+*.md
+
+# Configuration files that have specific formatting
+*.json
+*.yml
+*.yaml
+
+# Third-party or external files
+negentroper-proxy/
+webhook-server/
+standalone-landing.html
+
+# Config files with specific formatting needs
+next.config.mjs
+postcss.config.mjs
+tailwind.config.ts
+drizzle.config.ts
