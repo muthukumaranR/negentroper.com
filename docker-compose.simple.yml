@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  negentroper-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: negentroper.com:latest
+    container_name: negentroper-web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - negentroper-network
+
+networks:
+  negentroper-network:
+    driver: bridge

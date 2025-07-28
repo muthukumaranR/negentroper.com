@@ -1,15 +1,17 @@
-# Multi-stage Docker build for Next.js application
+# Multi-stage Dockerfile for Next.js static export
 FROM node:18-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
-COPY package.json package-lock.json* ./
-RUN npm ci --only=production
+# Install pnpm
+RUN npm install -g pnpm
+
+# Install dependencies based on pnpm
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -17,49 +19,41 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Install pnpm in builder stage
+RUN npm install -g pnpm
+
 # Environment variables for build
 ENV NEXT_TELEMETRY_DISABLED 1
 ENV NODE_ENV production
 
-# Build the application
-RUN npm run build
+# Build the static export
+RUN pnpm build
 
-# Production image, copy all the files and run next
-FROM base AS runner
-WORKDIR /app
+# Production image with nginx to serve static files
+FROM nginx:alpine AS runner
+WORKDIR /usr/share/nginx/html
 
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+# Remove default nginx static assets
+RUN rm -rf ./*
 
-# Create non-root user
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# Copy static assets from builder stage
+COPY --from=builder /app/out .
 
-# Copy necessary files
-COPY --from=builder /app/public ./public
-
-# Set the correct permission for prerender cache
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
-
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
 
 # Create health check script
-RUN echo '#!/bin/sh\ncurl -f http://localhost:3000/api/health || exit 1' > /usr/local/bin/healthcheck && \
+RUN echo '#!/bin/sh\nwget --no-verbose --tries=1 --spider http://localhost:80/ || exit 1' > /usr/local/bin/healthcheck && \
     chmod +x /usr/local/bin/healthcheck
 
-USER nextjs
+# Add labels for better container management
+LABEL org.opencontainers.image.source="https://github.com/muthukumaranR/negentroper.com"
+LABEL org.opencontainers.image.description="Negentroper.com - AI-driven landing page"
 
-EXPOSE 3000
-
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
+EXPOSE 80
 
 # Add health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD /usr/local/bin/healthcheck
 
-CMD ["node", "server.js"]
+CMD ["nginx", "-g", "daemon off;"]

@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  negentroper-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: negentroper.com:latest
+    container_name: negentroper-web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.negentroper.rule=Host(`negentroper.com`,`www.negentroper.com`)"
+      - "traefik.http.routers.negentroper.entrypoints=websecure"
+      - "traefik.http.routers.negentroper.tls.certresolver=letsencrypt"
+      - "traefik.http.services.negentroper.loadbalancer.server.port=80"
+    networks:
+      - negentroper-network
+
+  # Optional: Traefik for SSL termination (remove if not using)
+  traefik:
+    image: traefik:v2.10
+    container_name: negentroper-traefik
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"  # Traefik dashboard
+    environment:
+      - TRAEFIK_API_DASHBOARD=true
+      - TRAEFIK_API_INSECURE=true
+      - TRAEFIK_ENTRYPOINTS_WEB_ADDRESS=:80
+      - TRAEFIK_ENTRYPOINTS_WEBSECURE_ADDRESS=:443
+      - TRAEFIK_PROVIDERS_DOCKER=true
+      - TRAEFIK_PROVIDERS_DOCKER_EXPOSEDBYDEFAULT=false
+      - TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT_ACME_EMAIL=your-email@example.com
+      - TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT_ACME_STORAGE=/letsencrypt/acme.json
+      - TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT_ACME_HTTPCHALLENGE_ENTRYPOINT=web
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik-ssl-certs:/letsencrypt
+    networks:
+      - negentroper-network
+
+networks:
+  negentroper-network:
+    driver: bridge
+
+volumes:
+  traefik-ssl-certs:
+    driver: local
