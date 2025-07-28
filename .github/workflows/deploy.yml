@@ -153,7 +153,7 @@ jobs:
   # =====================================
   deploy:
     name: 🚀 Deploy to Target
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.RUNNER_TYPE || 'ubuntu-latest' }}
     needs: [build, pre-deploy-check]
     if: github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true'
     
