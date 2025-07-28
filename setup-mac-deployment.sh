@@ -1,0 +1,45 @@
+#!/bin/bash
+
+echo "🔧 Mac Deployment Setup Guide"
+echo "=============================="
+echo ""
+echo "1️⃣ Enable SSH on your Mac:"
+echo "   System Preferences > Sharing > Remote Login ✓"
+echo ""
+echo "2️⃣ Generate SSH key for GitHub Actions:"
+ssh-keygen -t ed25519 -C "github-actions-deploy" -f ~/.ssh/github-actions-deploy -N ""
+
+echo ""
+echo "3️⃣ Add to authorized keys:"
+cat ~/.ssh/github-actions-deploy.pub >> ~/.ssh/authorized_keys
+
+echo ""
+echo "4️⃣ Create deployment directory:"
+mkdir -p /opt/negentroper-com
+echo "   Note: You may need to use sudo or choose a different path like ~/negentroper-deploy"
+
+echo ""
+echo "5️⃣ Your deployment info:"
+echo "   DEPLOY_HOST: $(ipconfig getifaddr en0)"
+echo "   DEPLOY_USER: $(whoami)"
+echo "   DEPLOY_PATH: /opt/negentroper-com (or ~/negentroper-deploy)"
+echo ""
+echo "6️⃣ Private key for GitHub secrets (copy everything between the lines):"
+echo "   ============ START PRIVATE KEY ============"
+cat ~/.ssh/github-actions-deploy
+echo "   ============ END PRIVATE KEY ============"
+echo ""
+echo "7️⃣ Add these to GitHub Secrets:"
+echo "   https://github.com/muthukumaranR/negentroper.com/settings/secrets/actions"
+echo ""
+echo "   Secrets (click 'New repository secret'):"
+echo "   - DEPLOY_HOST: $(ipconfig getifaddr en0)"
+echo "   - DEPLOY_USER: $(whoami)"
+echo "   - DEPLOY_SSH_KEY: [paste private key from above]"
+echo ""
+echo "8️⃣ Add these Variables (click 'Variables' tab, then 'New repository variable'):"
+echo "   - DEPLOY_ENABLED: true"
+echo "   - DEPLOY_PATH: /opt/negentroper-com"
+echo "   - DEPLOY_URL: http://$(ipconfig getifaddr en0)"
+echo ""
+echo "✅ Setup complete!"

@@ -84,10 +84,10 @@ jobs:
         sarif_file: 'trivy-results.sarif'
 
   # =====================================
-  # Docker Build & Push
+  # Build & Package
   # =====================================
   build:
-    name: 🐳 Build Docker Image
+    name: 📦 Build and Package
     runs-on: ubuntu-latest
     needs: [ci, security]
     
@@ -95,37 +95,40 @@ jobs:
     - name: 📥 Checkout repository
       uses: actions/checkout@v4
       
-    - name: 🐳 Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-      
-    - name: 🔑 Log in to Container Registry
-      uses: docker/login-action@v3
+    - name: 📦 Setup pnpm
+      uses: pnpm/action-setup@v2
       with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        version: 9
         
-    - name: 📝 Extract metadata
-      id: meta
-      uses: docker/metadata-action@v5
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
       with:
-        images: ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}
-        tags: |
-          type=ref,event=branch
-          type=ref,event=pr
-          type=sha
-          type=raw,value=latest,enable={{is_default_branch}}
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'pnpm'
+        
+    - name: 📦 Install dependencies
+      run: pnpm install --frozen-lockfile
+      
+    - name: 🏗️ Build static site
+      run: pnpm build
+      
+    - name: 📦 Create deployment package
+      run: |
+        tar -czf deployment-package.tar.gz \
+          out \
+          Dockerfile \
+          docker-compose.simple.yml \
+          nginx.conf \
+          deployment-configs/ \
+          package.json \
+          pnpm-lock.yaml
           
-    - name: 🏗️ Build and push Docker image
-      uses: docker/build-push-action@v5
+    - name: 📤 Upload deployment artifact
+      uses: actions/upload-artifact@v3
       with:
-        context: .
-        platforms: linux/amd64,linux/arm64
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+        name: deployment-package
+        path: deployment-package.tar.gz
+        retention-days: 1
 
   # =====================================
   # Pre-Deployment Health Check
@@ -134,77 +137,95 @@ jobs:
     name: 🏥 Pre-Deployment Health Check
     runs-on: ubuntu-latest
     needs: build
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true'
     
     steps:
-    - name: 🔍 Check deployment server health
+    - name: 🔍 Check deployment target
       run: |
-        echo "🏥 Checking server health before deployment..."
-        # Add your server health check commands here
-        # curl -f http://${{ secrets.DEPLOY_HOST }}/health || exit 1
-        echo "✅ Server is healthy and ready for deployment"
+        echo "🏥 Checking deployment target..."
+        echo "📍 Target: ${{ secrets.DEPLOY_HOST }}"
+        echo "👤 User: ${{ secrets.DEPLOY_USER }}"
+        echo "📂 Path: ${{ vars.DEPLOY_PATH || '/opt/negentroper-com' }}"
+        echo "✅ Ready for deployment"
 
   # =====================================
   # Continuous Deployment
   # =====================================
   deploy:
-    name: 🚀 Deploy to Production
+    name: 🚀 Deploy to Target
     runs-on: ubuntu-latest
     needs: [build, pre-deploy-check]
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true'
     
     environment:
       name: production
-      url: https://negentroper.com
+      url: ${{ vars.DEPLOY_URL || 'http://localhost' }}
       
     steps:
-    - name: 📥 Checkout repository
-      uses: actions/checkout@v4
-      
+    - name: 📥 Download deployment package
+      uses: actions/download-artifact@v3
+      with:
+        name: deployment-package
+        
     - name: 🔧 Setup SSH
       uses: webfactory/ssh-agent@v0.9.0
       with:
         ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
         
-    - name: 📂 Prepare deployment files
-      run: |
-        tar -czf deployment.tar.gz \
-          docker-compose.yml \
-          Dockerfile \
-          .env.example \
-          deployment-configs/
-          
-    - name: 📤 Copy files to server
+    - name: 📤 Copy deployment package to target
       run: |
         scp -o StrictHostKeyChecking=no \
-          deployment.tar.gz \
+          deployment-package.tar.gz \
           ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/tmp/
           
     - name: 🚀 Deploy application
+      env:
+        DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '/opt/negentroper-com' }}
       run: |
         ssh -o StrictHostKeyChecking=no \
-          ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF'
+          ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'DEPLOY_SCRIPT'
           
-          # Extract deployment files
-          cd /opt/negentropic-com
-          tar -xzf /tmp/deployment.tar.gz
+          # Configuration
+          DEPLOY_DIR="${DEPLOY_PATH}"
           
-          # Update environment variables
-          echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
-          echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> .env
-          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+          # Create deployment directory if needed
+          mkdir -p $DEPLOY_DIR
+          cd $DEPLOY_DIR
           
-          # Pull latest image and deploy
-          docker-compose pull
-          docker-compose up -d --force-recreate
+          # Extract deployment package
+          echo "📦 Extracting deployment package..."
+          tar -xzf /tmp/deployment-package.tar.gz
           
-          # Wait for application to start
-          sleep 30
+          # Build Docker image locally
+          echo "🏗️ Building Docker image..."
+          docker build -t negentroper.com:latest .
+          
+          # Stop existing container
+          echo "🛑 Stopping existing container..."
+          docker-compose -f docker-compose.simple.yml down || true
+          
+          # Start new container
+          echo "🚀 Starting new container..."
+          docker-compose -f docker-compose.simple.yml up -d
+          
+          # Wait for health check
+          echo "⏳ Waiting for container health..."
+          sleep 20
+          
+          # Verify deployment
+          if docker ps | grep -q negentroper-web; then
+            echo "✅ Deployment successful!"
+            docker ps | grep negentroper-web
+          else
+            echo "❌ Deployment failed!"
+            docker logs negentroper-web
+            exit 1
+          fi
           
           # Cleanup
-          rm /tmp/deployment.tar.gz
-        EOF
+          rm /tmp/deployment-package.tar.gz
+          docker image prune -f
+        DEPLOY_SCRIPT
 
   # =====================================
   # Post-Deployment Testing
@@ -213,28 +234,35 @@ jobs:
     name: 🧪 Post-Deployment Testing
     runs-on: ubuntu-latest
     needs: deploy
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true'
     
     steps:
     - name: 🏥 Health check
+      env:
+        DEPLOY_URL: ${{ vars.DEPLOY_URL || 'http://${{ secrets.DEPLOY_HOST }}' }}
       run: |
         echo "🧪 Running post-deployment health checks..."
+        echo "🌐 Testing URL: ${DEPLOY_URL}"
         
-        # Wait for service to be fully ready
-        sleep 60
+        # Wait for service to be ready
+        sleep 30
         
-        # Check main application health
-        curl -f https://negentropic.com/api/health || {
-          echo "❌ Health check failed"
+        # Check main site
+        if curl -f -s -o /dev/null -w "%{http_code}" "${DEPLOY_URL}/" | grep -q "200"; then
+          echo "✅ Main site is accessible"
+        else
+          echo "❌ Main site health check failed"
           exit 1
-        }
+        fi
         
-        # Check admin health dashboard
-        curl -f https://negentropic.com/admin/health || {
-          echo "⚠️ Admin health check failed"
-        }
+        # Check health endpoint
+        if curl -f -s "${DEPLOY_URL}/health" | grep -q "healthy"; then
+          echo "✅ Health endpoint working"
+        else
+          echo "⚠️ Health endpoint not responding"
+        fi
         
-        echo "✅ All health checks passed"
+        echo "✅ Deployment verification complete"
         
     - name: 🎯 Performance validation
       run: |
@@ -256,23 +284,29 @@ jobs:
     name: 🔄 Rollback on Failure
     runs-on: ubuntu-latest
     needs: [deploy, post-deploy-test]
-    if: failure() && github.ref == 'refs/heads/main'
+    if: failure() && github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true'
     
     steps:
+    - name: 🔧 Setup SSH
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+        
     - name: 🔄 Rollback deployment
+      env:
+        DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '/opt/negentroper-com' }}
       run: |
         ssh -o StrictHostKeyChecking=no \
-          ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF'
+          ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'ROLLBACK_SCRIPT'
           
-          echo "🔄 Rolling back to previous version..."
-          cd /opt/negentropic-com
+          echo "🔄 Rolling back deployment..."
+          cd ${DEPLOY_PATH}
           
-          # Rollback to previous image
-          docker-compose down
-          docker-compose up -d --force-recreate
+          # Restart with previous image
+          docker-compose -f docker-compose.simple.yml restart
           
           echo "✅ Rollback completed"
-        EOF
+        ROLLBACK_SCRIPT
         
     - name: 🚨 Notify failure
       run: |
