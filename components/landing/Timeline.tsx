@@ -15,6 +15,16 @@ interface TimelineItem {
 
 const timelineData: TimelineItem[] = [
   {
+    id: '0',
+    year: '2025',
+    title: 'Negentropic Systems Design',
+    description: 'Building anti-entropic systems that create order from chaos.',
+    details: 'A comprehensive guide to designing systems that reduce entropy and increase organization, drawing from thermodynamics, information theory, and complex systems.',
+    type: 'writing',
+    link: '/writings/negentropic-systems',
+    tags: ['systems', 'entropy', 'design']
+  },
+  {
     id: '1',
     year: '2024',
     title: 'The Architecture of Thought',
