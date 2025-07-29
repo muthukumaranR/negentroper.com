@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ContentManager } from '@/lib/cms/content-manager';
 import { ContentFilter } from '@/lib/cms/types';
 
+export const dynamic = 'force-static';
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;

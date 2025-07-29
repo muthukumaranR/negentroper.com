@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { ContentManager } from '@/lib/cms/content-manager';
 
+export const dynamic = 'force-static';
+
 export async function GET() {
   try {
     const cms = ContentManager.getInstance();
