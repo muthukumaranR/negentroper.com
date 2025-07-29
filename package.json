@@ -11,7 +11,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
-    "test": "echo 'No tests configured yet' && exit 0"
+    "test": "echo 'No tests configured yet' && exit 0",
+    "cms": "node scripts/cms.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",
@@ -26,6 +27,7 @@
     "@radix-ui/react-toast": "^1.2.4",
     "@tanstack/react-query": "^5.70.3",
     "@tanstack/react-query-devtools": "^5.70.3",
+    "@uiw/react-md-editor": "^4.0.8",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",

@@ -41,11 +41,6 @@ next-env.d.ts
 /data/migrations/*
 !/data/migrations/.gitkeep
 
-# swarm coordination files
-.swarm/
-coordination/
-memory/
-
 # IDEs
 .vscode/
 .idea/
@@ -54,3 +49,6 @@ memory/
 
 # OS
 Thumbs.db
+
+# Swarm coordination files
+.swarm/
