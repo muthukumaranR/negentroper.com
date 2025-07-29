@@ -110,6 +110,15 @@ export class ContentManager {
         const contentHtml = processedContent.toString();
         
         return {
+          title: data.title || 'Untitled',
+          description: data.description || '',
+          date: data.date || new Date().toISOString(),
+          tags: data.tags || [],
+          category: data.category,
+          featured: data.featured,
+          draft: data.draft,
+          author: data.author,
+          coverImage: data.coverImage,
           ...data,
           id: file.replace('.md', ''),
           type: 'writing' as const,
@@ -139,6 +148,19 @@ export class ContentManager {
         const contentHtml = processedContent.toString();
         
         return {
+          title: data.title || 'Untitled',
+          description: data.description || '',
+          date: data.date || new Date().toISOString(),
+          tags: data.tags || [],
+          category: data.category,
+          featured: data.featured,
+          draft: data.draft,
+          author: data.author,
+          coverImage: data.coverImage,
+          technologies: data.technologies,
+          githubUrl: data.githubUrl,
+          liveUrl: data.liveUrl,
+          status: data.status,
           ...data,
           id: file.replace('.md', ''),
           type: 'project' as const,
@@ -164,6 +186,15 @@ export class ContentManager {
     
     if (type === 'writing') {
       return {
+        title: data.title || 'Untitled',
+        description: data.description || '',
+        date: data.date || new Date().toISOString(),
+        tags: data.tags || [],
+        category: data.category,
+        featured: data.featured,
+        draft: data.draft,
+        author: data.author,
+        coverImage: data.coverImage,
         ...data,
         id,
         type: 'writing' as const,
@@ -173,6 +204,19 @@ export class ContentManager {
       } as WritingContent;
     } else {
       return {
+        title: data.title || 'Untitled',
+        description: data.description || '',
+        date: data.date || new Date().toISOString(),
+        tags: data.tags || [],
+        category: data.category,
+        featured: data.featured,
+        draft: data.draft,
+        author: data.author,
+        coverImage: data.coverImage,
+        technologies: data.technologies,
+        githubUrl: data.githubUrl,
+        liveUrl: data.liveUrl,
+        status: data.status,
         ...data,
         id,
         type: 'project' as const,
